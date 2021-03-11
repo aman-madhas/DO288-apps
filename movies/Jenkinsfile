@@ -80,18 +80,9 @@ pipeline {
                       }
                     }
                 }
-                script {
-                  openshift.withCluster() {
-                    openshift.withProject(env.DEV_PROJECT) {
-                      openshift.selector("dc", "${APP_NAME}").rollout()
-                      openshift.selector("dc", "${APP_NAME}").related('pods').untilEach(1) {
-                        return (it.object().status.phase == "Running")
-                      }
-                    }
-                  }
-                }
                 sh '''
                   oc project ${DEV_PROJECT}
+                  oc new-app --as-deployment-config -i ${APP_NAME}
                   oc expose svc/${APP_NAME}
                 '''
             }
